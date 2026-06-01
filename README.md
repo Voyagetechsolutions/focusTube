@@ -1,5 +1,10 @@
 # FocusTube
 
+[![License: MIT](https://img.shields.io/badge/License-MIT-6c8cff.svg)](./LICENSE)
+[![Next.js](https://img.shields.io/badge/Next.js-14-black.svg)](https://nextjs.org/)
+[![TypeScript](https://img.shields.io/badge/TypeScript-5-3178c6.svg)](https://www.typescriptlang.org/)
+[![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https%3A%2F%2Fgithub.com%2FVoyagetechsolutions%2FfocusTube)
+
 A zero-distraction video platform prototype. Playback is enforced by two native
 browser APIs — the moment your attention leaves (tab hidden, or the player
 scrolled out of view), the video pauses. Every engagement signal is batched and
@@ -31,7 +36,8 @@ focustube/
 ├── components/
 │   ├── Dashboard.tsx           # Frontend: polls /api/analytics, renders stats
 │   ├── NavBar.tsx              # Shared nav (Catalog / Analytics)
-│   └── VideoPlayer.tsx         # Frontend: focus-aware HTML5 player
+│   ├── ThemeToggle.tsx         # Light/dark theme switch (persisted)
+│   └── VideoPlayer.tsx         # Frontend: focus-aware HTML5 player + focus streak
 ├── lib/
 │   ├── TokenBucket.ts          # Backend: isolated token-bucket algorithm
 │   ├── rateLimiter.ts          # Backend: per-client bucket store + sweeper
@@ -86,6 +92,36 @@ Then:
    on tab-hide a final `sendBeacon` fires.
 5. Open **/dashboard** in another tab to watch sessions, watch time, and
    distraction events (tab-hide / off-screen pauses) update live.
+
+---
+
+## Deploy
+
+[![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https%3A%2F%2Fgithub.com%2FVoyagetechsolutions%2FfocusTube)
+
+This is a standard Next.js App Router project and deploys to **Vercel** with no
+configuration:
+
+1. Click the button above (or import the repo at
+   [vercel.com/new](https://vercel.com/new)).
+2. Vercel auto-detects Next.js — no build settings, env vars, or root overrides
+   needed. Build command `next build`, output handled automatically.
+3. The telemetry/analytics routes run as serverless functions on the Node.js
+   runtime (already pinned via `export const runtime = "nodejs"`).
+
+> **Note on state:** the rate-limiter buckets and the telemetry aggregation are
+> **in-memory and per-instance**. On Vercel's serverless platform each function
+> invocation may hit a different instance, so analytics will look partial and
+> rate-limit counts won't be shared across instances. That's expected for a
+> prototype — see the rate-limiter section below for the Redis/shared-store path
+> to make both durable and global. It works as a single long-lived process under
+> `next start` (e.g. a container, a VM, or `npm run dev`).
+
+Any Node host works too:
+
+```bash
+npm install && npm run build && npm start   # serves on :3000
+```
 
 ---
 
@@ -192,3 +228,9 @@ const REFILL_RATE_PER_SEC = 5; // r — sustained tokens/second
 
 The client flushes once per 5s, so legitimate usage sits far under the limit
 while runaway loops are throttled with a `429` + `Retry-After`.
+
+---
+
+## License
+
+[MIT](./LICENSE) © Voyagetechsolutions
