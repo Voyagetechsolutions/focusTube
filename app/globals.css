@@ -1,0 +1,97 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* ---- Theme tokens -------------------------------------------------------- */
+/* Default = dark. `html.light` overrides for the light theme. Values are raw
+   "R G B" triplets so Tailwind's rgb(var(--x) / <alpha>) can apply opacity. */
+:root {
+  --bg: 8 9 15;
+  --surface: 17 19 28;
+  --surface-2: 21 24 38;
+  --fg: 232 236 246;
+  --glow: 0.16; /* ambient background-glow strength */
+  color-scheme: dark;
+}
+
+html.light {
+  --bg: 244 246 251;
+  --surface: 255 255 255;
+  --surface-2: 248 250 253;
+  --fg: 20 24 36;
+  --glow: 0.1;
+  color-scheme: light;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  background-color: rgb(var(--bg));
+  color: rgb(var(--fg));
+  -webkit-font-smoothing: antialiased;
+  /* Layered ambient glows so the page never reads as a flat slab. */
+  background-image: radial-gradient(
+      60rem 40rem at 15% -10%,
+      rgba(108, 140, 255, var(--glow)),
+      transparent 60%
+    ),
+    radial-gradient(
+      50rem 40rem at 100% 0%,
+      rgba(164, 114, 255, calc(var(--glow) * 0.85)),
+      transparent 55%
+    ),
+    radial-gradient(
+      50rem 50rem at 50% 120%,
+      rgba(76, 214, 200, calc(var(--glow) * 0.55)),
+      transparent 60%
+    );
+  background-attachment: fixed;
+  transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+/* Tall spacer so the IntersectionObserver demo is meaningful. */
+.scroll-spacer {
+  height: 110vh;
+}
+
+@layer components {
+  .glass {
+    @apply border border-fg/10 bg-fg/[0.04] backdrop-blur-xl;
+  }
+  .gradient-text {
+    @apply bg-brand-gradient bg-clip-text text-transparent;
+  }
+}
+
+/* Custom scrollbar to match the active theme. */
+::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+::-webkit-scrollbar-thumb {
+  background: rgb(var(--fg) / 0.18);
+  border-radius: 999px;
+  border: 2px solid transparent;
+  background-clip: content-box;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(108, 140, 255, 0.5);
+  background-clip: content-box;
+}
+
+/* Respect reduced-motion preferences. */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+    scroll-behavior: auto !important;
+  }
+}

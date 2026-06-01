@@ -1,0 +1,16 @@
+/node_modules
+/.next
+/out
+/build
+.DS_Store
+*.log
+.env*.local
+next-env.d.ts
+
+# Local tooling / preview config
+.claude/
+devserver.log
+server.log
+
+# TypeScript incremental build cache
+*.tsbuildinfo
